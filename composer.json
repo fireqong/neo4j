@@ -19,7 +19,6 @@
             "email": "church_qi@aliyun.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=7.4",
         "guzzlehttp/guzzle": "7.4.x-dev"
