@@ -29,7 +29,7 @@ class Result implements \IteratorAggregate, \ArrayAccess
      */
     public function getIterator()
     {
-        return $this->data;
+        return $this->getData();
     }
 
     /**
@@ -40,6 +40,11 @@ class Result implements \IteratorAggregate, \ArrayAccess
     public function getRawResponse()
     {
         return $this->rawResponse;
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 
     public function offsetExists($offset): bool

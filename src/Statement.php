@@ -6,7 +6,7 @@ class Statement
 {
     protected string $statement;
 
-    protected array $params;
+    protected array $params = [];
 
     public function __construct(string $statement)
     {

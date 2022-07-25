@@ -43,7 +43,12 @@ $transaction->begin();
 ### commit
 
 ```php
-$transaction->commit();
+$result = $transaction->commit();
+
+if ($result->getRawResponse()->getStatusCode() == 200) {
+    print_r($result->getData());
+}
+
 ```
 
 ### keepAlive
@@ -63,7 +68,8 @@ $transaction->rollback();
 ### beginAndCommit
 
 ```php 
-$transaction->beginAndCommit();
+$result = $transaction->beginAndCommit();
+print_r($result);
 ```
 
 ## Test

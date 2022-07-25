@@ -57,10 +57,9 @@ class Transaction
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function beginAndCommit(): bool
+    public function beginAndCommit(): Result
     {
-        $result = $this->app->post('/db/neo4j/tx/commit', $this->statements->getData());
-        return $result->getRawResponse()->getStatusCode() == 200;
+        return $this->app->post('/db/neo4j/tx/commit', $this->statements->getData());
     }
 
     /**
@@ -69,11 +68,13 @@ class Transaction
      * @return bool
      * @throws \Exception
      */
-    public function rollback()
+    public function rollback(): bool
     {
-        return $this->doTransaction(function ($transaction) {
+        $result = $this->doTransaction(function ($transaction) {
             return $transaction->app->delete($transaction->commitResult->getRawResponse()->getHeaderLine('Location'));
         });
+
+        return $result->getRawResponse()->getStatusCode() == 200;
     }
 
     /**
@@ -84,12 +85,14 @@ class Transaction
      */
     public function keepAlive(): bool
     {
-        return $this->doTransaction(function ($transaction) {
+        $result = $this->doTransaction(function ($transaction) {
             return $transaction->app->post(
                 $transaction->commitResult->getRawResponse()->getHeaderLine('Location'),
                 StatementRepository::getInstance(true)->getData()
             );
         });
+
+        return $result->getRawResponse()->getStatusCode() == 200;
     }
 
     /**
@@ -99,17 +102,16 @@ class Transaction
      * @return bool
      * @throws \Exception
      */
-    public function doTransaction(callable $callback): bool
+    public function doTransaction(callable $callback): ?Result
     {
         if ($this->commitResult->getRawResponse()->getStatusCode() == 201) {
             if (strtotime($this->commitResult['transaction']['expires']) < time()) {
                 throw new \Exception('事务已过期');
             }
 
-            $result = call_user_func($callback, $this);
-            return $result->getRawResponse()->getStatusCode() == 200;
+            return call_user_func($callback, $this);
         }
 
-        return false;
+        return null;
     }
 }
